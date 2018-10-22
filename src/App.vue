@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import mySelector from './mySelector'
 import house from './house'
 import addForm from './addForm'
 
@@ -83,8 +82,7 @@ export default {
                         this.$refs.myForm.style.height = 'auto';
                     }
                 })
-            }
-            else {
+            } else {
                 //якщо height==auto і присвоїти height - 0, не буде анімації
                 this.$refs.myForm.style.height = this.$refs.myForm.scrollHeight + 'px';
                 setTimeout(() => {
@@ -146,7 +144,6 @@ export default {
         }
     },
     components: {
-        mySelector,
         house,
         addForm,
     },
