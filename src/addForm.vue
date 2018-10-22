@@ -2,13 +2,13 @@
     <div class="add_house">
         <div class="data">
             <div class="data_title">
-                <span>Адреса: </span>
+                <span>Адреса:</span>
             </div>
             <b-form-input v-model="house.address"></b-form-input>
         </div>
         <div class="data">
             <div class="data_title">
-                <span>Статус: </span>
+                <span>Статус:</span>
             </div>
             <div class="my_selector">
                 <b-dropdown id="ddown-aria" :text="defaultStatus" variant="primary" class="m-2">
@@ -22,7 +22,7 @@
         </div>
         <div class="data">
             <div class="data_title">
-                <span>Ціна: </span>
+                <span>Загальна сума:</span>
             </div>
             <b-form-input v-model="house.totalPrice"></b-form-input>
         </div>

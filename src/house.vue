@@ -21,7 +21,7 @@
                         </div>
                     </div>
                     <div class="price">
-                        <p>Price {{house.totalPrice}} ua</p>
+                        <p>Загальна сума: {{house.totalPrice}} ua</p>
                     </div>
                 </div>
                 <div class="details">

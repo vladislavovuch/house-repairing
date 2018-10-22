@@ -9,7 +9,7 @@
                 </div>
                 <!-- price -->
                 <div class="price">
-                    <span>Price:</span>
+                    <span>Ціна:</span>
                     <b-form-input v-model="cost.price" @input="$emit('save')"></b-form-input>
                 </div>
             </div>
@@ -26,9 +26,6 @@
                 </b-button>
             </div>
         </div>
-        <!-- <div class="load" v-if="spending.length === 0">
-            <a class="button button-lg button-primary" href="#" @click.prevent="addSpending(spending,-1)">Add new cost</a>
-        </div> -->
     </div>
 </template>
 
