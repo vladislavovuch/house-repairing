@@ -10,12 +10,10 @@
             <div class="data_title">
                 <span>Статус: </span>
             </div>
-            <!-- <b-form-input v-model="house.address"></b-form-input> -->
             <div class="my_selector">
-                <!-- <my-selector :listVariants="statusList" :defaultValue="defaultStatus" @select-value="saveStatus"></my-selector> -->
                 <b-dropdown id="ddown-aria" :text="defaultStatus" variant="primary" class="m-2">
                     <b-dropdown-item-button aria-describedby="header1" 
-                    v-for="(elem, index) in statusList"
+                    v-for="(elem, index) in $root.statusList"
                     :key="index" 
                     :id="index" 
                     @click="saveStatus(elem.text)">{{elem.text}}</b-dropdown-item-button>
@@ -35,7 +33,7 @@
             <b-form-input v-model="house.ownerName"></b-form-input>
         </div>
         <p class="text-success">Кошторис</p>
-        <!-- <spending v-if="!house.spending.length" :costIndex="costIndex" :spending="house.spending"></spending> -->
+        <!-- Витрати -->
         <div class="spending_wrap">
             <spending v-for="(cost,costIndex) in house.spending" :key="costIndex" :cost="cost" :costIndex="costIndex" :spending="house.spending"></spending>
         </div>
@@ -46,7 +44,6 @@
 </template>
 
 <script>
-import mySelector from './mySelector'
 import spending from "./spending";
 export default {
     data() {
@@ -63,17 +60,6 @@ export default {
                     }
                 ]
             },
-            statusList: [
-                {
-                    text: "запланирован"
-                },
-                {
-                    text: "начат"
-                },
-                {
-                    text: "окончен"
-                }
-            ],
             defaultStatus: "запланирован"
         }
     },
@@ -83,17 +69,19 @@ export default {
             this.house.status = text;
         },
         saveData() {
+           // this.saveStatus(this.defaultStatus);
             // змінюємо кількість локально і в бд
             this.$root.number++;
             window.localStorage.setItem('number', JSON.stringify(this.$root.number));
             // записуєм елемент в бд
             window.localStorage.setItem(`house${this.$root.number}`, JSON.stringify(this.house));
             console.log(window.localStorage);
+            // створюєм подію, яку слухаєм в батьківському компоненті і по якій додаєм в dom ще один будинок якщо їх < 5
             this.$emit('update');
             // очистити форму
             this.house = {
                 address: "",
-                status: "",
+                status: "запланирован",
                 totalPrice: "",
                 ownerName: "",
                 spending: [
@@ -106,7 +94,6 @@ export default {
         }
     },
     components: {
-        mySelector,
         spending,
     }
 }

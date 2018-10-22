@@ -14,7 +14,17 @@ new Vue({
     render: h => h(App),
     store,
     data: {
-        showVariants: false,
         number: 0,
+        statusList: [
+            {
+                text: "запланирован"
+            },
+            {
+                text: "начат"
+            },
+            {
+                text: "окончен"
+            }
+        ],
     }
 })

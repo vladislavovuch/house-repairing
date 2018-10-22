@@ -1,16 +1,16 @@
 <template>
-    <div id="app" @click="hideVariants">
+    <div id="app">
         <div class="wrap">
             <div class="add_house">
                 <a class="button button-lg button-primary" href="#" @click="toggleForm">Add new house</a>
             </div>
-            <div class="myForm anime" ref="myForm">
+            <div class="form_animation" ref="myForm">
                 <add-form @update="addNewHouse"></add-form>
             </div>
             <div class="filter">
                 <b-dropdown id="ddown-aria" :text="defaultValue" variant="primary" class="m-2">
                     <b-dropdown-item-button aria-describedby="header1" 
-                    v-for="(elem, index) in statusList"
+                    v-for="(elem, index) in $root.statusList"
                     :key="index" 
                     :id="index" 
                     @click="saveSelectedValue(elem.text)">{{elem.text}}</b-dropdown-item-button>
@@ -31,17 +31,6 @@ export default {
     name: 'app',
     data () {
         return {
-            statusList: [
-                {
-                    text: "запланирован"
-                },
-                {
-                    text: "начат"
-                },
-                {
-                    text: "окончен"
-                }
-            ],
             counter: 0,
             price: 1000,
             showAddForm: false,
@@ -86,39 +75,27 @@ export default {
     },
     methods: {
         toggleForm() {
-            console.dir(this.$refs.myForm);
-            // this.$refs.myForm.style.display = "block";
-            // console.log(this.$refs.myForm.scrollHeight);
-            // this.$refs.myForm.style.height = '488px';
-            // this.$refs.myForm.classList.add('anime');
-            console.log(this.$refs.myForm.style.height);
-            // this.$refs.myForm.style.height = this.$refs.myForm.scrollHeight + 'px';
             if (this.$refs.myForm.style.height == "" || this.$refs.myForm.style.height == "0px" ) {
                 this.$refs.myForm.style.height = this.$refs.myForm.scrollHeight + 'px';
-                // this.$refs.myForm.addEventListener('transitionend',() => {
-                //     if (this.$refs.myForm.style.height !== "0px" )
-                //         this.$refs.myForm.style.height = 'auto';
-                // })
-                setTimeout(() => {
-                    if (!(this.$refs.myForm.style.height == "" || this.$refs.myForm.style.height == "0px" ))
+                // коли закінчиться анімація форми робим heught: auto 
+                this.$refs.myForm.addEventListener('transitionend',() => {
+                    if (!(this.$refs.myForm.style.height == "" || this.$refs.myForm.style.height == "0px" )) {
                         this.$refs.myForm.style.height = 'auto';
-                },700)
+                    }
+                })
             }
             else {
+                //якщо height==auto і присвоїти height - 0, не буде анімації
                 this.$refs.myForm.style.height = this.$refs.myForm.scrollHeight + 'px';
                 setTimeout(() => {
                     this.$refs.myForm.style.height = '0px';
                 },0)
-                // this.$refs.myForm.style.height = '0px';
-                //clear form
+                //clear form ?????
             }
 
         },
         saveSelectedValue(text) {
             this.defaultValue = text;
-        },
-        hideVariants() {
-            // this.$root.showVariants = false;
         },
         scroll() {
             window.onscroll = () => {
@@ -130,12 +107,13 @@ export default {
             };
         },
         addNewHouse() {
-            this.addContent();
+            if (this.counter < 5) {
+                this.addContent();
+            }
             this.toggleForm();
         },
         addContent() {
             // отримуєм storage
-            console.log("DSFDSF")
             let storage = window.localStorage;
             // кількість домів в storage
             this.$root.number = Number(storage.getItem('number'));
@@ -143,19 +121,21 @@ export default {
             for (let i = this.counter; i < this.counter + 5 && i < this.$root.number; i++) {
                 this.housesList.push(JSON.parse(storage.getItem(`house${i + 1}`)));
             }
-            if (this.counter + 5<= this.$root.number)
+            if (this.counter + 5<= this.$root.number) {
                 this.counter += 5;
-            else this.counter = this.$root.number;
+            } else {
+                this.counter = this.$root.number;
+            }
             this.filterHouses();
         },
         filterHouses() {
             this.filteredHousesList = this.housesList.filter(house => {
-                if (this.filtered)
+                if (this.filtered) {
                     return house.status === this.defaultValue;
+                }
                 return true;
 
             });
-            console.log(this.filteredHousesList)
         },
         activateFilter() {
             this.filtered = true;
@@ -412,14 +392,11 @@ export default {
         }
     }
     
-    .myForm {
+    .form_animation {
         @extend %standart;
         height: 0;
         overflow: hidden;
         box-sizing: inherit;
-    }
-    .anime {
-        // display: block !important;
         transition: height .7s !important;
     }
     .filter {

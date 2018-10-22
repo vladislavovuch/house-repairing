@@ -13,10 +13,10 @@
                         <div class="selector_wrap">
                             <b-dropdown id="ddown-aria" :text="house.status" variant="primary" class="m-2">
                                 <b-dropdown-item-button aria-describedby="header1" 
-                                v-for="(elem, index) in statusList"
+                                v-for="(elem, index) in $root.statusList"
                                 :key="index" 
                                 :id="index" 
-                                @click="saveSelectedValue(elem.text)">{{elem.text}}</b-dropdown-item-button>
+                                @click="saveSelectedStatus(elem.text)">{{elem.text}}</b-dropdown-item-button>
                             </b-dropdown>
                         </div>
                     </div>
@@ -34,43 +34,21 @@
                 <div class="owner">
                     <p class="text-primary text-center">Власник: {{house.ownerName}}</p>
                 </div>
-                <spending v-on:save="saveNewData" v-if="house.spending.length !== 0" v-for="(cost,costIndex) in house.spending" :key="costIndex" :cost="cost" :costIndex="costIndex" :spending="house.spending"></spending>
-                <!-- <div class="spending_money" v-if="house.spending.length !== 0" v-for="(cost,costIndex) in house.spending" :key="costIndex">
-                    
-                    <div class="spending_money_wrap">
-                        <div class="material">
-                            <span>Витрата: </span>
-                            <b-form-input v-model="cost.spendingDescription"></b-form-input>
-                        </div>
-                        
-                        <div class="price">
-                            <span>Price:</span>
-                            <b-form-input v-model="cost.price"></b-form-input>
-                        </div>
-                    </div>
-                    <div class="control_buttons">
-                        <b-button class="add" variant="success" @click="addSpending(house.spending, costIndex)">
-                            <svg aria-hidden="true" data-prefix="fas" data-icon="plus" class="svg-inline--fa fa-plus fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                                <path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
-                            </svg>
-                        </b-button>
-                        <b-button class="delete" variant="danger" @click="deleteCost(house.spending, costIndex)">
-                            <svg aria-hidden="true" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
-                                <path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path>
-                            </svg>
-                        </b-button>
-                    </div>
-                </div>
-                <div class="load" v-if="house.spending.length === 0">
-                    <a class="button button-lg button-primary" href="#" @click.prevent="addSpending(house.spending,-1)">Add new cost</a>
-                </div> -->
+                <spending @save="saveNewData" 
+                v-if="house.spending.length !== 0" 
+                v-for="(cost,costIndex) in house.spending" 
+                :key="costIndex" 
+                :cost="cost" 
+                :costIndex="costIndex" 
+                :spending="house.spending"
+                >
+                </spending>
             </div>
         </transition>
     </div>
 </template>
 
 <script>
-import mySelector from './mySelector'
 import spending from './spending'
 
 export default {
@@ -80,38 +58,28 @@ export default {
     },
     data () {
         return {
-            statusList: [
-                {
-                    text: "запланирован"
-                },
-                {
-                    text: "начат"
-                },
-                {
-                    text: "окончен"
-                }
-            ],
             price: 1000,
             defaultValue: "запланирован",
             showAdditionalInfo: false,
         }
     },
     methods: {
-        saveSelectedValue(text) {
+        // змінюєм статус
+        saveSelectedStatus(text) {
             this.defaultValue = text;
             this.house.status = text;
             this.saveNewData();
+            // перемальовуєм по фільтру
             this.$emit('updated-status');
-        },
-        hideVariants() {
-            this.$root.showVariants = false;
         },
         addSpending(spending, index) {
             console.log(index);
             console.log(spending);
-            if (spending.length)
+            if (spending.length) {
                 spending.splice(index + 1,0,{spendingDescription: "", price: ""});
-            else spending.push({spendingDescription: "", price: ""});
+            } else {
+                spending.push({spendingDescription: "", price: ""});
+            } 
         },
         deleteCost(spending, index) {
             console.log(index);
@@ -124,14 +92,8 @@ export default {
         }
     },
     components: {
-        mySelector,
         spending,
     },
-    // watch: {
-    //     house: function() {
-    //         console.log("CHANGE")
-    //     }
-    // }
 }
 </script>
 
