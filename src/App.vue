@@ -4,16 +4,16 @@
             <div class="add_house">
                 <a class="button button-lg button-primary" href="#" @click="toggleForm">Add new house</a>
             </div>
-            <div class="form_animation" ref="myForm">
+            <div class="form_animation zero_height" ref="myForm">
                 <add-form @update="addNewHouse"></add-form>
             </div>
             <div class="filter">
-                <b-dropdown id="ddown-aria" :text="defaultValue" variant="primary" class="m-2">
+                <b-dropdown id="ddown-aria" :text="defaultValue.text" variant="primary" class="m-2">
                     <b-dropdown-item-button aria-describedby="header1" 
                     v-for="(elem, index) in $root.statusList"
                     :key="index" 
                     :id="index" 
-                    @click="saveSelectedValue(elem.text)">{{elem.text}}</b-dropdown-item-button>
+                    @click="saveSelectedValue(elem)">{{elem.text}}</b-dropdown-item-button>
                 </b-dropdown>
                 <button class="btn btn_filter" @click="activateFilter">Filter</button>
             </div>
@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import mySelector from './mySelector'
 import house from './house'
 import addForm from './addForm'
 
@@ -36,7 +35,7 @@ export default {
             showAddForm: false,
             house: {
                 address: "Келецька 98, кв 307/2",
-                status: "запланирован",
+                status: 1,
                 totalPrice: 1000,
                 ownerName: "Державна власність",
                 spending: [
@@ -66,36 +65,23 @@ export default {
                     },
                 ]
             },
-            defaultValue: "запланирован",
+            defaultValue: {
+                text: "запланирован",
+                id: 1
+            },
             showAdditionalInfo: false,
-            housesList: [],
             filteredHousesList: [],
             filtered: false,
         }
     },
     methods: {
         toggleForm() {
-            if (this.$refs.myForm.style.height == "" || this.$refs.myForm.style.height == "0px" ) {
-                this.$refs.myForm.style.height = this.$refs.myForm.scrollHeight + 'px';
-                // коли закінчиться анімація форми робим heught: auto 
-                this.$refs.myForm.addEventListener('transitionend',() => {
-                    if (!(this.$refs.myForm.style.height == "" || this.$refs.myForm.style.height == "0px" )) {
-                        this.$refs.myForm.style.height = 'auto';
-                    }
-                })
-            }
-            else {
-                //якщо height==auto і присвоїти height - 0, не буде анімації
-                this.$refs.myForm.style.height = this.$refs.myForm.scrollHeight + 'px';
-                setTimeout(() => {
-                    this.$refs.myForm.style.height = '0px';
-                },0)
-                //clear form ?????
-            }
-
+            //якщо height==auto і присвоїти height - 0, не буде анімації
+            this.$refs.myForm.classList.toggle('zero_height');
+            this.$refs.myForm.classList.toggle('auto_height');
         },
-        saveSelectedValue(text) {
-            this.defaultValue = text;
+        saveSelectedValue(elem) {
+            this.defaultValue = elem;
         },
         scroll() {
             window.onscroll = () => {
@@ -116,22 +102,38 @@ export default {
             // отримуєм storage
             let storage = window.localStorage;
             // кількість домів в storage
-            this.$root.number = Number(storage.getItem('number'));
+            //this.$root.number = Number(storage.getItem('number'));
+            const list = JSON.parse(storage.getItem(`housesList`));
+            if (list)
+                this.$root.housesList = list;
             // 5 наступних домів виводим
-            for (let i = this.counter; i < this.counter + 5 && i < this.$root.number; i++) {
-                this.housesList.push(JSON.parse(storage.getItem(`house${i + 1}`)));
-            }
-            if (this.counter + 5<= this.$root.number) {
-                this.counter += 5;
+            // for (let i = this.counter; i < this.counter + 5 && i < this.$root.number; i++) {
+            //     this.housesList.push(JSON.parse(storage.getItem(`house${i + 1}`)));
+            // }
+            // if (this.counter + 5 <= this.$root.number) {
+            //     this.counter += 5;
+            // } else {
+            //     this.counter = this.$root.number;
+            // }
+            if (this.$root.number + 5 > this.$root.housesList.length) {
+                this.$root.number = this.$root.housesList.length;
             } else {
-                this.counter = this.$root.number;
+                this.$root.number += 5;
             }
+            console.log(this.$root.number)
+            // this.$root.counter
+            // this.$root.housesList.length
             this.filterHouses();
         },
         filterHouses() {
-            this.filteredHousesList = this.housesList.filter(house => {
+            let i = 0;
+            this.filteredHousesList = this.$root.housesList.filter(house => {
+                if (i === Number(this.$root.number))
+                    return false;
+                i++;
                 if (this.filtered) {
-                    return house.status === this.defaultValue;
+                    console.log(Number(house.status) , Number(this.defaultValue.id))
+                    return Number(house.status) === Number(this.defaultValue.id);
                 }
                 return true;
 
@@ -146,7 +148,6 @@ export default {
         }
     },
     components: {
-        mySelector,
         house,
         addForm,
     },
@@ -394,7 +395,7 @@ export default {
     
     .form_animation {
         @extend %standart;
-        height: 0;
+        // height: 0px;
         overflow: hidden;
         box-sizing: inherit;
         transition: height .7s !important;
@@ -419,5 +420,11 @@ export default {
                 // color: rgb(85, 87, 59);
             }
         }
+    }
+    .auto_height{
+        height: auto;
+    }
+    .zero_height {
+        height: 0px;
     }
 </style>

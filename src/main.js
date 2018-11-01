@@ -17,14 +17,18 @@ new Vue({
         number: 0,
         statusList: [
             {
-                text: "запланирован"
+                text: "запланирован",
+                id: 1
             },
             {
-                text: "начат"
+                text: "начат",
+                id: 2
             },
             {
-                text: "окончен"
+                text: "окончен",
+                id: 3
             }
         ],
+        housesList: [],
     }
 })

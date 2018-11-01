@@ -11,12 +11,15 @@
                     </div>
                     <div class="status">
                         <div class="selector_wrap">
-                            <b-dropdown id="ddown-aria" :text="house.status" variant="primary" class="m-2">
+                            <b-dropdown id="ddown-aria" :text="statusText.text" variant="primary" class="m-2">
                                 <b-dropdown-item-button aria-describedby="header1" 
                                 v-for="(elem, index) in $root.statusList"
                                 :key="index" 
                                 :id="index" 
-                                @click="saveSelectedStatus(elem.text)">{{elem.text}}</b-dropdown-item-button>
+                                @click="saveSelectedStatus(elem)"
+                                >
+                                    {{elem.text}}
+                                </b-dropdown-item-button>
                             </b-dropdown>
                         </div>
                     </div>
@@ -63,11 +66,25 @@ export default {
             showAdditionalInfo: false,
         }
     },
+    computed: {
+        statusText: {
+            get: function() {
+                let a = this.$root.statusList.find(status => status.id === this.house.status);
+                console.log(a);
+                return a;
+            },
+            set: function(newValue) {
+                console.log(newValue)
+                this.house.status = newValue.id;
+            }
+        }
+    },
     methods: {
         // змінюєм статус
-        saveSelectedStatus(text) {
-            this.defaultValue = text;
-            this.house.status = text;
+        saveSelectedStatus(elem) {
+            // this.defaultValue = text;
+            this.house.status = elem.id;
+            this.statusText = elem;
             this.saveNewData();
             // перемальовуєм по фільтру
             this.$emit('updated-status');
@@ -76,7 +93,7 @@ export default {
             console.log(index);
             console.log(spending);
             if (spending.length) {
-                spending.splice(index + 1,0,{spendingDescription: "", price: ""});
+                spending.splice(index + 1,0, {spendingDescription: "", price: ""});
             } else {
                 spending.push({spendingDescription: "", price: ""});
             } 
@@ -88,7 +105,8 @@ export default {
         },
         saveNewData() {
             console.log("save");
-            window.localStorage.setItem(`house${this.index + 1}`, JSON.stringify(this.house));
+            // this.$root.housesList.push(this.house);
+            window.localStorage.setItem(`housesList`, JSON.stringify(this.$root.housesList));
         }
     },
     components: {

@@ -1,45 +1,47 @@
 <template>
     <div class="add_house">
-        <div class="data">
-            <div class="data_title">
-                <span>Адреса: </span>
+        <form action="" @click="">
+            <div class="data">
+                <div class="data_title">
+                    <span>Адреса: </span>
+                </div>
+                <b-form-input v-model="house.address" required></b-form-input>
             </div>
-            <b-form-input v-model="house.address"></b-form-input>
-        </div>
-        <div class="data">
-            <div class="data_title">
-                <span>Статус: </span>
+            <div class="data">
+                <div class="data_title">
+                    <span>Статус: </span>
+                </div>
+                <div class="my_selector">
+                    <b-dropdown id="ddown-aria" :text="defaultStatus.text" variant="primary" class="m-2">
+                        <b-dropdown-item-button aria-describedby="header1" 
+                        v-for="(elem, index) in $root.statusList"
+                        :key="index" 
+                        :id="index" 
+                        @click="saveStatus(elem)">{{elem.text}}</b-dropdown-item-button>
+                    </b-dropdown>
+                </div>            
             </div>
-            <div class="my_selector">
-                <b-dropdown id="ddown-aria" :text="defaultStatus" variant="primary" class="m-2">
-                    <b-dropdown-item-button aria-describedby="header1" 
-                    v-for="(elem, index) in $root.statusList"
-                    :key="index" 
-                    :id="index" 
-                    @click="saveStatus(elem.text)">{{elem.text}}</b-dropdown-item-button>
-                </b-dropdown>
-            </div>            
-        </div>
-        <div class="data">
-            <div class="data_title">
-                <span>Ціна: </span>
+            <div class="data">
+                <div class="data_title">
+                    <span>Ціна: </span>
+                </div>
+                <b-form-input v-model="house.totalPrice" required type="number"></b-form-input>
             </div>
-            <b-form-input v-model="house.totalPrice"></b-form-input>
-        </div>
-        <div class="data">
-            <div class="data_title">
-                <span>Власник: </span>
+            <div class="data">
+                <div class="data_title">
+                    <span>Власник: </span>
+                </div>
+                <b-form-input v-model="house.ownerName" required></b-form-input>
             </div>
-            <b-form-input v-model="house.ownerName"></b-form-input>
-        </div>
-        <p class="text-success">Кошторис</p>
-        <!-- Витрати -->
-        <div class="spending_wrap">
-            <spending v-for="(cost,costIndex) in house.spending" :key="costIndex" :cost="cost" :costIndex="costIndex" :spending="house.spending"></spending>
-        </div>
-        <div class="save_house">
-            <a class="button button-lg button-primary" @click="saveData">Save</a>
-        </div>
+            <p class="text-success">Кошторис</p>
+            <!-- Витрати -->
+            <div class="spending_wrap">
+                <spending v-for="(cost,costIndex) in house.spending" :key="costIndex" :cost="cost" :costIndex="costIndex" :spending="house.spending"></spending>
+            </div>
+            <div class="save_house">
+                <button class="button button-lg button-primary" type="submit" @click="saveData($event)">Save</button>
+            </div>
+        </form>
     </div>
 </template>
 
@@ -50,7 +52,7 @@ export default {
         return {
             house: {
                 address: "",
-                status: "запланирован",
+                status: 1,
                 totalPrice: "",
                 ownerName: "",
                 spending: [
@@ -60,28 +62,47 @@ export default {
                     }
                 ]
             },
-            defaultStatus: "запланирован"
+            defaultStatus: {
+                text: "запланирован",
+                id: 1
+            }
         }
     },
     methods: {
-        saveStatus(text) {
-            this.defaultStatus = text;
-            this.house.status = text;
+        saveStatus(elem) {
+            this.defaultStatus = elem;
+            this.house.status = elem.id;
         },
-        saveData() {
+        checkValid() {
+            for(let key in this.house) {
+                if (this.house[key] === "") {
+                    console.log(this.house[key]);
+                    return false;
+                }
+            }
+            return true;
+        },
+        saveData(event) {             
+            if (!this.checkValid()) {
+                alert("Введіть дані в усі поля");
+                return;
+            }
            // this.saveStatus(this.defaultStatus);
             // змінюємо кількість локально і в бд
             this.$root.number++;
             window.localStorage.setItem('number', JSON.stringify(this.$root.number));
+
+            this.$root.housesList.push(this.house);
             // записуєм елемент в бд
-            window.localStorage.setItem(`house${this.$root.number}`, JSON.stringify(this.house));
+            window.localStorage.setItem('housesList', JSON.stringify(this.$root.housesList));
             console.log(window.localStorage);
+           
             // створюєм подію, яку слухаєм в батьківському компоненті і по якій додаєм в dom ще один будинок якщо їх < 5
             this.$emit('update');
             // очистити форму
             this.house = {
                 address: "",
-                status: "запланирован",
+                status: 1,
                 totalPrice: "",
                 ownerName: "",
                 spending: [
@@ -91,6 +112,7 @@ export default {
                     }
                 ]
             }
+            event.preventDefault();
         }
     },
     components: {
@@ -117,6 +139,12 @@ export default {
         border: 1px solid black;
         padding-bottom: 20px;
         margin: 10px;
+        form {
+            @extend %standart;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .data {
             @extend %standart;
             max-width: 800px;
@@ -165,7 +193,7 @@ export default {
         @extend %standart;
         @extend %alignCenter;
         margin-top: 30px;
-        a {
+        button {
             background-color: rgb(252,239,87);
             color: black;
             text-transform: uppercase;
@@ -180,6 +208,8 @@ export default {
             overflow: hidden;
             user-select: none;
             border-radius: 4px;
+            transition: .3s;
+            border: none;
             &:hover {
                 color: #fff;
                 background-color: #35ad79;

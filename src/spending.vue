@@ -5,12 +5,12 @@
             <div class="spending_money_wrap">
                 <div class="material">
                     <span>Витрата: </span>
-                    <b-form-input v-model="cost.spendingDescription" @input="$emit('save')"></b-form-input>
+                    <b-form-input v-model="cost.spendingDescription" @input="$emit('save')" required></b-form-input>
                 </div>
                 <!-- price -->
                 <div class="price">
                     <span>Price:</span>
-                    <b-form-input v-model="cost.price" @input="$emit('save')"></b-form-input>
+                    <b-form-input v-model="cost.price" @input="$emit('save')" type="number" required></b-form-input>
                 </div>
             </div>
             <div class="control_buttons" @click="$emit('save')">
